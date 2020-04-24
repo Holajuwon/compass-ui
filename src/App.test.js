@@ -1,9 +1,9 @@
 import React from "react";
 import { render } from "@testing-library/react";
-import App from "./App";
+import AllPosts from "./Pages/AllPosts";
 
 test("renders Chrakra UI in App", () => {
-  const { getByText } = render(<App />);
-  const element = getByText(/Chakra UI/i);
+  const { getByText } = render(<AllPosts />);
+  const element = getByText(/Latest Post/i);
   expect(element).toBeInTheDocument();
 });
