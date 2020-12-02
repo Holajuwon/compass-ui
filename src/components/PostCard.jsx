@@ -9,7 +9,7 @@ const PostCard = (props) => {
       <Heading size="lg">{content.post_title}</Heading>
       <Link
         to={{
-          pathname: `/post/${content.post_title}`,
+          pathname: `/post/${content.post_title.replace(/ /g, '_')}`,
           state: { ...content },
           hash: `#compass${Math.trunc(Math.random() * 100)}`,
         }}
