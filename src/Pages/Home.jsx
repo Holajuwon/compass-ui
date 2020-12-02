@@ -1,9 +1,8 @@
 import React from "react";
 import Layout from "../components/Layout";
-import InstallPWA from "../components/InstallPWA";
 import { Home } from "../components/Home";
 import { HomeCards } from "../components/HomeCards";
-import { Box, Flex } from "@chakra-ui/core";
+import { Flex } from "@chakra-ui/core";
 import { HomeForm } from "../components/HomeForm";
 import { HomeAside } from "../components/HomeAside";
 
