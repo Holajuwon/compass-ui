@@ -5,6 +5,7 @@ import AllPosts from "./Pages/AllPosts";
 import Editor from "./Pages/Editor";
 import Post from "./Pages/Post";
 import Error from "./Pages/Error";
+import RegisterForm from './Pages/RegisterForm'
 
 export default () => (
   <BrowserRouter>
@@ -12,6 +13,7 @@ export default () => (
     <Route component={Home} path="/" exact />
       <Route component={AllPosts} path="/posts" exact />
       <Route component={Editor} path="/editor" />
+      <Route component={RegisterForm} path ='/register' />
       <Route path="/post" component={Post} />
       <Route path="/post">
         <Redirect to="/" />

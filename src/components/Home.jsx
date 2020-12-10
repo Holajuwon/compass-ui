@@ -43,7 +43,7 @@ export const Home = () => {
         </Link>
       </Flex>
       <Image
-        src="https://res.cloudinary.com/dobztfsdj/image/upload/v1580686534/samples/imagecon-group.jpg"
+        src="https://res.cloudinary.com/dobztfsdj/image/upload/c_lfill,h_700,w_2134/v1606909890/samples/people/vr_boy1_rgqhxi.jpg"
         h="70vh"
         w="100%"
         backgroundSize='cover'
