@@ -7,7 +7,7 @@ import {
   Box,
   Spinner,
   useToast,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import PostCard from "./PostCard";
 import { fetchNews } from "./api";
 import { MdAdd } from "react-icons/md";
@@ -63,7 +63,7 @@ const PostsView = () => {
           Latest Posts
         </Heading>
         <Link to="/editor">
-          <Button leftIcon={MdAdd} variantColor="blue" variant="outline">
+          <Button leftIcon={<MdAdd />} colorScheme="brand" variant="outline">
             New Post
           </Button>
         </Link>

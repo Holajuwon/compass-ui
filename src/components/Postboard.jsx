@@ -2,15 +2,11 @@ import React, { useState } from "react";
 import {
   Box,
   Textarea,
-  Input,
   Stack,
   Button,
   Heading,
-  InputGroup,
-  InputLeftAddon,
-  InputRightAddon,
   useToast,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { FaPen, FaLightbulb } from "react-icons/fa";
 import { useHistory } from "react-router-dom";
 import { createPost } from "./api";
@@ -36,7 +32,7 @@ const Postboard = () => {
         isClosable: true,
         position: "top",
       });
-      history.push("/");
+      history.push("/posts");
     } else {
       toast({
         title: "Couldn't create post.",
@@ -52,16 +48,20 @@ const Postboard = () => {
   return (
     <Stack spacing={8} align="center" w="90vw">
       <Box d="flex" alignItems="center" justifyContent="space-between" mt="1">
-        <Box as={FaLightbulb} size="30px" color="yellow.400" />
-        <Heading fontSize={{ md: "3rem", sm: "2rem", xs: "1.5rem" }}>
+        <Box as={FaLightbulb} boxSize="30px" color="yellow.400" />
+        <Heading
+          align="center"
+          fontSize={{ md: "3rem", sm: "2rem", xs: "1.5rem" }}
+        >
           Engage Your Creativity
         </Heading>
-        <Box as={FaPen} size="25px" color="green.400" />
+        <Box as={FaPen} boxSize="25px" color="green.400" />
       </Box>
       <Textarea
         w="80%"
         variant="flushed"
         size="lg"
+        fontWeight="extrabold"
         fontSize="2em"
         placeholder="Title"
         height="3vh"
@@ -69,14 +69,10 @@ const Postboard = () => {
         onChange={handleChange}
         name="title"
       />
-      <InputGroup size="sm">
-        <InputLeftAddon children="https://" />
-        <Input type="file" rounded="0" placeholder="mysite" display="none" />
-        <InputRightAddon children=".com" />
-      </InputGroup>
+
       <Textarea
-        minH="40em"
-        size="5xl"
+        minH="70vh"
+        padding={5}
         placeholder="Write You Post Here"
         fontSize="1.3em"
         onChange={handleChange}
@@ -84,9 +80,8 @@ const Postboard = () => {
       />
 
       <Button
-        size="md"
         height="48px"
-        width="200px"
+        width="80vw"
         border="2px"
         borderColor="blue.500"
         onClick={handleSubmit}

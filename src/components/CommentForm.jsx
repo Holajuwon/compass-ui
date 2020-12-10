@@ -6,7 +6,7 @@ import {
   ButtonGroup,
   Alert,
   AlertIcon,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { MdCancel, MdDone } from "react-icons/md";
 
 export const CommentForm = (props) => {
@@ -41,8 +41,8 @@ export const CommentForm = (props) => {
         />
         <ButtonGroup spacing={4} display="flex" justifyContent="flex-end">
           <Button
-            leftIcon={MdCancel}
-            variantColor="pink"
+            leftIcon={<MdCancel />}
+            colorScheme="pink"
             variant="solid"
             onClick={() => {
               handleCancel();
@@ -51,8 +51,8 @@ export const CommentForm = (props) => {
             Cancel
           </Button>
           <Button
-            rightIcon={MdDone}
-            variantColor="blue"
+            rightIcon={<MdDone />}
+            colorScheme="blue"
             variant="outline"
             onClick={() => {
               submit(comment);

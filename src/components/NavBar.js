@@ -1,14 +1,13 @@
 import React from "react";
 import {
   Box,
-  PseudoBox,
   useColorMode,
   IconButton,
   Badge,
   Text,
   Flex,
   Link,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { FaGithub, FaSun, FaMoon } from "react-icons/fa";
 import { Link as RouterLink } from "react-router-dom";
 
@@ -16,7 +15,7 @@ const Navbar = () => {
   const { colorMode, toggleColorMode } = useColorMode();
 
   return (
-    <PseudoBox
+    <Box
       borderBottom="1px solid blue.500"
       borderColor="blue.300"
       shadow="md"
@@ -36,7 +35,7 @@ const Navbar = () => {
           rel="noopener noreferrer"
           href="https://github.com/Holajuwon/compass-api"
         >
-          <Box size={28} as={FaGithub} />
+          <Box size={20}  as={FaGithub} />
         </Link>
         <Flex
           display="flex"
@@ -44,25 +43,25 @@ const Navbar = () => {
           alignItems="flex-start"
           justifyContent="flex-start"
         >
-          <RouterLink to="/">
+          <RouterLink to="/posts">
             <Text fontSize="3xl" fontWeight="bold" textDecor="none">
               Compass
             </Text>
           </RouterLink>
-          <Badge variant="subtle" variantColor="pink" ml={1}>
+          <Badge variant="subtle" colorScheme="pink" ml={1}>
             BETA
           </Badge>
         </Flex>
         <IconButton
           onClick={toggleColorMode}
           variant="ghost"
-          variantColor="teal"
+          colorScheme="teal"
           aria-label="Call Sage"
           fontSize="20px"
-          icon={colorMode === "light" ? FaMoon : FaSun}
+          icon={colorMode === "light" ? <FaMoon /> : <FaSun />}
         />
       </Box>
-    </PseudoBox>
+    </Box>
   );
 };
 

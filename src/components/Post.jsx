@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Stack, Heading, Text, Box } from "@chakra-ui/core";
+import { Stack, Heading, Text, Box } from "@chakra-ui/react";
 import { useLocation } from "react-router-dom";
 
 const Post = () => {

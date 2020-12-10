@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { Box, Image, Flex, Badge, Text, Stack } from "@chakra-ui/core";
+import { Box, Image, Flex, Badge, Text, Stack } from "@chakra-ui/react";
 import { MdStar } from "react-icons/md";
 import App from "./Layout";
 
@@ -16,7 +16,7 @@ export const Deno = () => (
     >
       <Image rounded="md" src="https://bit.ly/2k1H1t6" />
       <Flex align="baseline" mt={2}>
-        <Badge variantColor="brand">Plus</Badge>
+        <Badge colorScheme="brand">Plus</Badge>
         <Text
           ml={2}
           textTransform="uppercase"

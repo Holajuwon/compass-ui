@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Stack } from "@chakra-ui/core";
+import { Stack } from "@chakra-ui/react";
 import Comment from "./Comment";
 import { deleteComment } from "./api";
 

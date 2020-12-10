@@ -1,7 +1,20 @@
-import { theme } from "@chakra-ui/core";
+import { theme, extendTheme } from "@chakra-ui/react";
 
-export const customTheme = {
+const config = {
+  initialColorMode: "dark",
+  useSystemColorMode: false,
+};
+
+export const customTheme = extendTheme({
   ...theme,
+  components: {
+    Divider: {
+      baseStyle: {
+        colorScheme: "black",
+        fontWeight: "bold",
+      },
+    },
+  },
   colors: {
     ...theme.colors,
     // Go to https://smart-swatch.netlify.com/ to easily generate a new color
@@ -19,4 +32,5 @@ export const customTheme = {
       900: "#001b1b",
     },
   },
-};
+  config,
+});

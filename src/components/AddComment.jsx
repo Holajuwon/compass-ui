@@ -8,7 +8,7 @@ import {
   Stat,
   StatLabel,
   StatNumber,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { FaPen } from "react-icons/fa";
 import { CommentForm } from "./CommentForm";
 
@@ -48,8 +48,8 @@ const AddComment = ({ counts, submit, message }) => {
           </Stat>
         )}
         <Button
-          leftIcon={FaPen}
-          variantColor="facebook"
+          leftIcon={<FaPen />}
+          colorScheme="facebook"
           variant="solid"
           onClick={() => {
             setToggle(true);

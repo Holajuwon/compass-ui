@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Flex, Icon, Text } from "@chakra-ui/core";
+import { Box, Flex, Icon, Text } from "@chakra-ui/react";
 
 export const HomeCards = (props) => {
   return (
@@ -14,12 +14,11 @@ export const HomeCards = (props) => {
       justify="center"
       align="center"
       direction="column"
-      flex = {'0 0 auto'}
+      flex={"0 0 auto"}
       bg={props.card.bg}
-      ml='30px'
+      ml="30px"
     >
-      <Box ml='20px' mr='20px'>
-        <Icon name={props.card.icon} />
+      <Box ml="20px" mr="20px">
         <Text fontSize="35px" lineHeight="50px">
           {props.card.title}
         </Text>

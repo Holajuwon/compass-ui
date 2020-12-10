@@ -1,6 +1,7 @@
 import React from "react";
-import { Box, Divider, Flex, IconButton, Image, Text } from "@chakra-ui/core";
+import { Box, Divider, Flex, IconButton, Image, Text } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
+import { FaChevronRight } from "react-icons/fa";
 
 export const Home = () => {
   return (
@@ -36,17 +37,17 @@ export const Home = () => {
             </Text>
             <IconButton
               variant="outline"
-              variantColor="#052142"
-              icon="arrow-forward"
+              colorScheme="#052142"
+              icon={<FaChevronRight />}
             />
           </Box>
         </Link>
       </Flex>
       <Image
-        src="https://res.cloudinary.com/dobztfsdj/image/upload/v1580686534/samples/imagecon-group.jpg"
+        src="https://res.cloudinary.com/dobztfsdj/image/upload/c_lfill,h_700,w_2134/v1606909890/samples/people/vr_boy1_rgqhxi.jpg"
         h="70vh"
         w="100%"
-        backgroundSize='cover'
+        backgroundSize="cover"
       />
       <Text
         textAlign="center"
@@ -58,12 +59,14 @@ export const Home = () => {
       </Text>
 
       <Flex p="10px" justify="space-around">
-        <Text color="" fontSize='25px' fontFamily='times news roman'>Explore by category.</Text>
+        <Text color="" fontSize="25px" fontFamily="times news roman">
+          Explore by category.
+        </Text>
         <Box as="button" rounded="md" bg="#3da1ae" color="white" px={4} h={8}>
           See all
         </Box>
       </Flex>
-      <Divider borderColor="black" ml="40px" mr="40px" mb = '30px'/>
+      <Divider borderColor="black" w="80vw" mx="auto"  mb="30px" />
     </Box>
   );
 };

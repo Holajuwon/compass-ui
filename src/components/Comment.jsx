@@ -13,7 +13,7 @@ import {
   PopoverCloseButton,
   PopoverBody,
   Button,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { FaReply, FaHeart } from "react-icons/fa";
 import { MdMoreHoriz, MdDelete, MdEdit } from "react-icons/md";
 import { CommentForm } from "./CommentForm";
@@ -51,10 +51,10 @@ const Comment = ({ comment, handleDelete }) => {
           <PopoverTrigger>
             <IconButton
               variant="ghost"
-              variantColor="blue"
+              colorScheme="blue"
               aria-label="options"
               fontSize="25px"
-              icon={MdMoreHoriz}
+              icon={<MdMoreHoriz />}
               isRound
             />
           </PopoverTrigger>
@@ -64,8 +64,8 @@ const Comment = ({ comment, handleDelete }) => {
             <PopoverCloseButton />
             <PopoverBody display="flex" flexDir="column">
               <Button
-                leftIcon={MdDelete}
-                variantColor="blue"
+                leftIcon={<MdDelete />}
+                colorScheme="blue"
                 m="1"
                 onClick={() => {
                   handleDelete(comment.comment_id);
@@ -74,8 +74,8 @@ const Comment = ({ comment, handleDelete }) => {
                 Delete
               </Button>
               <Button
-                leftIcon={MdEdit}
-                variantColor="blue"
+                leftIcon={<MdEdit />}
+                colorScheme="blue"
                 m="1"
                 onClick={() => {
                   setEdit(true);
@@ -95,8 +95,8 @@ const Comment = ({ comment, handleDelete }) => {
       >
         <Text>{comment.user_comment}</Text>
         <Flex justifyContent="space-between" alignItems="flex-end">
-          <IconButton aria-label="icon" icon={FaHeart} color="red.400" />
-          <IconButton aria-label="icon" icon={FaReply} />
+          <IconButton aria-label="icon" icon={<FaHeart />} color="red.400" />
+          <IconButton aria-label="icon" icon={<FaReply />} />
         </Flex>
       </Box>
     </Box>

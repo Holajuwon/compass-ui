@@ -1,30 +1,22 @@
 import React from "react";
-import {
-  ThemeProvider,
-  CSSReset,
-  ColorModeProvider,
-  Stack,
-  DarkMode,
-} from "@chakra-ui/core";
+import { ChakraProvider, Stack, DarkMode } from "@chakra-ui/react";
 import { customTheme } from "../theme";
 import Navbar from "./NavBar";
 import Footer from "./Footer";
 
 const App = (props) => {
   return (
-    <ThemeProvider theme={customTheme}>
-      <ColorModeProvider>
-        <DarkMode />
-        <CSSReset />
-        <Stack>
-          <Stack minHeight="100vh">
-            <Navbar />
-            <Stack align="center">{props.children}</Stack>
-          </Stack>
-          <Footer />
+    <ChakraProvider theme={customTheme}>
+      <DarkMode />
+
+      <Stack>
+        <Stack minHeight="120%">
+          <Navbar />
+          <Stack align="center">{props.children}</Stack>
         </Stack>
-      </ColorModeProvider>
-    </ThemeProvider>
+        <Footer />
+      </Stack>
+    </ChakraProvider>
   );
 };
 

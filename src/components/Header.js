@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Heading, Flex, Text, Button } from "@chakra-ui/core";
+import { Box, Heading, Flex, Text, Button } from "@chakra-ui/react";
 
 const MenuItems = ({ children }) => (
   <Text mt={{ base: 4, md: 0 }} mr={6} display="block">
@@ -24,7 +24,7 @@ const Header = (props) => {
       pos='fixed'
     >
       <Flex align="center" mr={5}>
-        <Heading as="h1" size="lg">
+        <Heading as="h1" boxSize="lg">
           Compass
         </Heading>
       </Flex>
