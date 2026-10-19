@@ -1,64 +1,120 @@
 import React, { useEffect, useState } from "react";
+import { Box, Heading, Text, useToast } from "@chakra-ui/react";
+import { useLocation, useParams } from "react-router-dom";
 import Layout from "../components/Layout";
 import Post from "../components/Post";
 import AddComment from "../components/AddComment";
-import { fetchComment, createComment } from "../components/api";
 import CommentList from "../components/CommentList";
+import { createComment, fetchComment, fetchNews } from "../components/api";
 
-export default ({ match, location }) => {
-  const [comment, setComment] = useState([]);
-  const [message, setMessage] = useState();
-  const [count, setCount] = useState(0);
-  const { state } = location;
-  var id;
-  if (state) {
-    id = state.post_id;
+const normalizeTitle = (title = "") => title.trim().replace(/_/g, " ").toLowerCase();
+
+const readCachedPosts = () => {
+  try {
+    const posts = JSON.parse(localStorage.getItem("posts") || "[]");
+    return Array.isArray(posts) ? posts : [];
+  } catch (error) {
+    return [];
   }
+};
+
+const findPost = (posts, slug) =>
+  posts.find((post) => normalizeTitle(post.post_title) === normalizeTitle(slug)) || null;
+
+const PostPage = () => {
+  const location = useLocation();
+  const { string: slug } = useParams();
+  const toast = useToast();
+  const [story, setStory] = useState(() =>
+    location.state?.post_title && normalizeTitle(location.state.post_title) === normalizeTitle(slug)
+      ? location.state
+      : findPost(readCachedPosts(), slug)
+  );
+  const [loading, setLoading] = useState(!story);
+  const [comments, setComments] = useState([]);
+  const [commentCount, setCommentCount] = useState(0);
 
   useEffect(() => {
-    setTimeout(async () => {
-      const comments = await fetchComment(id);
-      if (comments) {
-        setComment(comments.comment);
-        setCount(comments.count);
-      }
-    }, 1000);
-  }, [state, comment, id]);
+    const routeStory = location.state?.post_title && normalizeTitle(location.state.post_title) === normalizeTitle(slug)
+      ? location.state
+      : null;
+    const cachedStory = findPost(readCachedPosts(), slug);
+
+    if (routeStory || cachedStory) {
+      setStory(routeStory || cachedStory);
+      setLoading(false);
+      return undefined;
+    }
+
+    let active = true;
+    setStory(null);
+    setLoading(true);
+    fetchNews()
+      .then((posts) => {
+        if (active) setStory(Array.isArray(posts) ? findPost(posts, slug) : null);
+      })
+      .catch(() => {
+        if (active) setStory(null);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [location.state, slug]);
+
+  useEffect(() => {
+    let active = true;
+    if (!story?.post_id) {
+      setComments([]);
+      setCommentCount(0);
+      return () => {
+        active = false;
+      };
+    }
+
+    fetchComment(story.post_id).then((result) => {
+      if (!active) return;
+      const fetchedComments = Array.isArray(result?.comment) ? result.comment : [];
+      setComments(fetchedComments);
+      setCommentCount(Number(result?.count) || fetchedComments.length);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [story?.post_id]);
 
   const handleCommentSubmit = async (newComment) => {
-    const data = await createComment(newComment, id);
-    if (data) {
-      setComment([...data, ...comment]);
-      setMessage({
-        title: "Successful.",
-        description: "Comment was posted successful.",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "top",
-      });
-    } else {
-      setMessage({
-        title: "Note.",
-        description: "You must add some contents to comment.",
-        status: "warning",
-        duration: 5000,
-        isClosable: true,
-        position: "top",
-      });
+    try {
+      const result = await createComment(newComment, story.post_id);
+      if (!result) throw new Error("Comment was not accepted");
+      const addedComments = Array.isArray(result) ? result : [result];
+      setComments((current) => [...addedComments, ...current]);
+      setCommentCount((current) => current + addedComments.length);
+      toast({ title: "Comment added", status: "success", duration: 3000, isClosable: true });
+    } catch (error) {
+      toast({ title: "Comment could not be added", description: "Please check your connection and try again.", status: "error", duration: 4000, isClosable: true });
     }
-    setMessage();
   };
 
   return (
     <Layout>
-      <Post/>
-      <AddComment
-        counts={count}
-        submit={handleCommentSubmit}
-        message={message}
-      />
-      <CommentList comment={comment} />
+      <Post content={story} loading={loading} />
+      {story && (
+        <Box maxW="900px" w="full" mx="auto" px={{ base: 5, md: 10 }} pb={{ base: 12, md: 18 }}>
+          <Box pt={8} borderTop="1px solid" borderColor="blackAlpha.200">
+            <Heading as="h2" fontSize="2xl">Join the conversation</Heading>
+            <Text mt={2} mb={6} color="gray.600">What stayed with you from this story?</Text>
+            <AddComment counts={commentCount} submit={handleCommentSubmit} />
+            <CommentList comment={comments} />
+          </Box>
+        </Box>
+      )}
     </Layout>
   );
 };
+
+export default PostPage;

@@ -1,94 +1,142 @@
 import React, { useState } from "react";
 import {
   Box,
-  Textarea,
-  Stack,
   Button,
+  Flex,
+  FormControl,
+  FormLabel,
   Heading,
+  Input,
+  Link,
+  Text,
+  Textarea,
   useToast,
 } from "@chakra-ui/react";
-import { FaPen, FaLightbulb } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { FaArrowLeft, FaPaperPlane } from "react-icons/fa";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { createPost } from "./api";
 
 const Postboard = () => {
   const navigate = useNavigate();
   const toast = useToast();
+  const [post, setPost] = useState({ title: "", content: "" });
+  const [submitting, setSubmitting] = useState(false);
+  const wordCount = post.content.trim() ? post.content.trim().split(/\s+/).length : 0;
 
-  const [post, setPost] = useState();
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setPost({ ...post, [name]: value });
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setPost((currentPost) => ({ ...currentPost, [name]: value }));
   };
-  const handleSubmit = async () => {
-    const data = await createPost(post);
-    if (data) {
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!post.title.trim() || !post.content.trim()) {
       toast({
-        title: "Post created successfully.",
-        description: "You have successfully created your post.",
+        title: "Your story needs a title and a body",
+        status: "warning",
+        duration: 3500,
+        isClosable: true,
+      });
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const data = await createPost({
+        ...post,
+        title: post.title.trim(),
+        content: post.content.trim(),
+      });
+      if (!data) throw new Error("The post was not accepted");
+      toast({
+        title: "Your story is on its way",
+        description: "Thanks for adding your voice to the journal.",
         status: "success",
-        duration: 9000,
+        duration: 4500,
         isClosable: true,
         position: "top",
       });
       navigate("/posts");
-    } else {
+    } catch (error) {
       toast({
-        title: "Couldn't create post.",
-        description: "Make sure your post has a title and some content.",
+        title: "We couldn't publish this story",
+        description: "Please check your connection and try again.",
         status: "error",
-        duration: 9000,
+        duration: 5000,
         isClosable: true,
         position: "top",
       });
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <Stack spacing={8} align="center" w="90vw">
-      <Box d="flex" alignItems="center" justifyContent="space-between" mt="1">
-        <Box as={FaLightbulb} boxSize="30px" color="yellow.400" />
-        <Heading
-          align="center"
-          fontSize={{ md: "3rem", sm: "2rem", xs: "1.5rem" }}
-        >
-          Engage Your Creativity
-        </Heading>
-        <Box as={FaPen} boxSize="25px" color="green.400" />
+    <Box className="page-enter" minH="75vh" bg="paper">
+      <Box maxW="900px" mx="auto" px={{ base: 5, md: 10 }} py={{ base: 10, md: 16 }}>
+        <Link as={RouterLink} to="/posts" display="inline-flex" alignItems="center" gap={2} color="gray.600" fontSize="sm" fontWeight="semibold" mb={10} _hover={{ color: "green.700", textDecoration: "none" }}>
+          <FaArrowLeft aria-hidden="true" /> Back to stories
+        </Link>
+        <Box mb={10}>
+          <Text color="green.700" fontSize="xs" fontWeight="bold" textTransform="uppercase">A page is a place to begin</Text>
+          <Heading as="h1" mt={3} fontSize={{ base: "4xl", md: "6xl" }}>Write into the open.</Heading>
+          <Text mt={4} color="gray.600" fontSize={{ base: "md", md: "lg" }} lineHeight="1.7" maxW="650px">
+            Share a perspective, a useful lesson, or a question you can't stop thinking about.
+          </Text>
+        </Box>
+
+        <Box as="form" onSubmit={handleSubmit} bg="white" border="1px solid" borderColor="blackAlpha.100" borderRadius="4px" p={{ base: 5, md: 9 }}>
+          <FormControl isRequired>
+            <FormLabel htmlFor="title" color="gray.600" fontSize="xs" fontWeight="bold" textTransform="uppercase">Story title</FormLabel>
+            <Input
+              id="title"
+              name="title"
+              value={post.title}
+              onChange={handleChange}
+              placeholder="Give your idea a name"
+              maxLength={160}
+              variant="unstyled"
+              fontFamily="heading"
+              fontSize={{ base: "2xl", md: "4xl" }}
+              h="auto"
+              py={3}
+              borderBottom="1px solid"
+              borderColor="blackAlpha.200"
+              _focus={{ borderColor: "green.600" }}
+            />
+            <Text mt={2} textAlign="right" color="gray.500" fontSize="xs">{post.title.length}/160</Text>
+          </FormControl>
+
+          <FormControl isRequired mt={9}>
+            <Flex justify="space-between" align="center" mb={2}>
+              <FormLabel htmlFor="content" mb={0} color="gray.600" fontSize="xs" fontWeight="bold" textTransform="uppercase">Your story</FormLabel>
+              <Text color="gray.500" fontSize="xs">{wordCount} {wordCount === 1 ? "word" : "words"}</Text>
+            </Flex>
+            <Textarea
+              id="content"
+              name="content"
+              value={post.content}
+              onChange={handleChange}
+              placeholder="Start with the part you keep coming back to..."
+              minH={{ base: "360px", md: "480px" }}
+              resize="vertical"
+              borderColor="blackAlpha.200"
+              borderRadius="2px"
+              lineHeight="1.8"
+              fontSize="md"
+              _focusVisible={{ borderColor: "green.600", boxShadow: "0 0 0 1px #456f5b" }}
+            />
+          </FormControl>
+
+          <Flex mt={7} justify="space-between" align="center" gap={5} wrap="wrap">
+            <Text color="gray.500" fontSize="xs">Your work will be shared with the Compass community.</Text>
+            <Button type="submit" isLoading={submitting} loadingText="Publishing" bg="ink" color="white" borderRadius="full" px={7} rightIcon={<FaPaperPlane />} _hover={{ bg: "green.800", transform: "translateY(-1px)" }}>
+              Publish story
+            </Button>
+          </Flex>
+        </Box>
       </Box>
-      <Textarea
-        w="80%"
-        variant="flushed"
-        size="lg"
-        fontWeight="extrabold"
-        fontSize="2em"
-        placeholder="Title"
-        height="3vh"
-        textAlign="center"
-        onChange={handleChange}
-        name="title"
-      />
-
-      <Textarea
-        minH="70vh"
-        padding={5}
-        placeholder="Write You Post Here"
-        fontSize="1.3em"
-        onChange={handleChange}
-        name="content"
-      />
-
-      <Button
-        height="48px"
-        width="80vw"
-        border="2px"
-        borderColor="blue.500"
-        onClick={handleSubmit}
-      >
-        Publish
-      </Button>
-    </Stack>
+    </Box>
   );
 };
 

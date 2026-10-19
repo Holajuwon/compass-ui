@@ -7,7 +7,7 @@ import Post from "./Pages/Post";
 import Error from "./Pages/Error";
 import RegisterForm from './Pages/RegisterForm'
 
-export default () => (
+const Router = () => (
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<Home />} />
@@ -20,3 +20,5 @@ export default () => (
     </Routes>
   </BrowserRouter>
 );
+
+export default Router;

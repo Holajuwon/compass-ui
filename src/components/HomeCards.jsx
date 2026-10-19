@@ -1,36 +1,31 @@
 import React from "react";
-import { Box, Flex, Heading, Link, Text } from "@chakra-ui/react";
+import { Flex, Link } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
-import { FaArrowRight } from "react-icons/fa";
+import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 
 export const HomeCards = ({ card }) => {
   return (
     <Link
       as={RouterLink}
-      to="/posts"
-      flex="0 0 250px"
-      minH="210px"
-      p={6}
-      bg={card.bg}
-      color="#17251f"
-      borderTop="3px solid"
-      borderColor={card.accent}
-      textDecoration="none"
-      transition="transform 160ms ease, box-shadow 160ms ease"
-      _hover={{ transform: "translateY(-4px)", boxShadow: "md", textDecoration: "none" }}
-      _focusVisible={{ outline: "3px solid", outlineColor: card.accent, outlineOffset: "3px" }}
+      to={`/posts?q=${encodeURIComponent(card.query)}`}
+      flex="0 0 auto"
+      gap={4}
+      alignItems="center"
+      px={5}
+      py={3}
+      bg="white"
+      border="1px solid"
+      borderColor="blackAlpha.100"
+      borderRadius="full"
+      color="ink"
+      fontSize="sm"
+      fontWeight="semibold"
+      className="interactive-lift focus-ring"
+      _hover={{ borderColor: "brand.500", textDecoration: "none" }}
     >
-      <Flex direction="column" justify="space-between" h="full" minH="150px">
-        <Box>
-          <Heading as="h3" fontFamily="Georgia, serif" fontSize="2xl" fontWeight="medium">
-            {card.title}
-          </Heading>
-          <Text mt={3} color="#3b4c45" lineHeight="1.6">{card.body}</Text>
-        </Box>
-        <Flex align="center" justify="space-between" mt={5} color={card.accent} fontSize="sm" fontWeight="bold">
-          Explore stories <FaArrowRight aria-hidden="true" />
-        </Flex>
-      </Flex>
+      <Flex w={2} h={2} borderRadius="full" bg={card.tone === "coral" ? "coral.400" : card.tone === "lime" ? "brand.400" : card.tone === "blue" ? "blue.400" : card.tone === "violet" ? "purple.400" : "green.500"} />
+      {card.title}
+      <FaArrowUpRightFromSquare aria-hidden="true" size={12} />
     </Link>
   );
 };

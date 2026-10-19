@@ -1,0 +1,108 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap");
+
+:root {
+  --paper: #f4f5ef;
+  --surface: #ffffff;
+  --ink: #17231f;
+  --muted: #69736d;
+  --line: #dce1d8;
+  --lime: #d8fb55;
+  --green: #456f5b;
+  --coral: #df755f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "DM Sans", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--lime);
+  color: var(--ink);
+}
+
+a {
+  text-underline-offset: 4px;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.page-enter {
+  animation: page-enter 520ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.stagger-in > * {
+  animation: rise-in 620ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.stagger-in > *:nth-child(2) {
+  animation-delay: 80ms;
+}
+
+.stagger-in > *:nth-child(3) {
+  animation-delay: 150ms;
+}
+
+.stagger-in > *:nth-child(4) {
+  animation-delay: 220ms;
+}
+
+.image-reveal {
+  animation: image-reveal 900ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.interactive-lift {
+  transition: transform 180ms ease, box-shadow 180ms ease, color 180ms ease;
+}
+
+.interactive-lift:hover {
+  transform: translateY(-4px);
+}
+
+.focus-ring:focus-visible {
+  outline: 3px solid var(--coral);
+  outline-offset: 4px;
+}
+
+@keyframes page-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes image-reveal {
+  from { opacity: 0.65; transform: scale(1.035); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

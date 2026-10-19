@@ -1,181 +1,173 @@
-import React, { useEffect, useState } from "react";
-import { fetchCountries, fetchStates, registerUser } from "./api";
-
+import React, { useEffect, useRef, useState } from "react";
 import {
+  Alert,
+  AlertIcon,
   Box,
   Button,
-  Divider,
   FormControl,
   FormLabel,
   Heading,
   Input,
   Select,
-  Stack,
+  SimpleGrid,
   Text,
+  VStack,
+  useToast,
 } from "@chakra-ui/react";
+import { fetchCountries, fetchStates, registerUser } from "./api";
+
+const initialForm = {
+  firstName: "",
+  lastName: "",
+  phone: "",
+  country: "",
+  countryCode: "",
+  state: "",
+  email: "",
+  password: "",
+};
 
 export const RegisterForm = () => {
-  const [countries, setCountries] = useState("");
-  const [states, setStates] = useState("");
-  const [formData, setFormData] = useState();
-  const [response, setResponse] = useState();
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [formData, setFormData] = useState(initialForm);
+  const [loadingCountries, setLoadingCountries] = useState(true);
+  const [loadingStates, setLoadingStates] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [registered, setRegistered] = useState(false);
+  const toast = useToast();
+  const statesRequest = useRef(0);
 
-  const handleOnCountry = async (e) => {
-    let { name, value } = e.target;
-    value = JSON.parse(value);
-    const data = await fetchStates(value.country_name);
-    setStates(data);
-    setFormData({
-      ...formData,
-      country: value.country_name,
-      countryCode: value.country_short_name,
-    });
+  useEffect(() => {
+    let active = true;
+    fetchCountries()
+      .then((data) => {
+        if (active && Array.isArray(data)) setCountries(data);
+      })
+      .catch(() => {
+        if (active) {
+          toast({ title: "Location list unavailable", description: "You can still complete the other fields.", status: "warning", duration: 4000, isClosable: true });
+        }
+      })
+      .finally(() => {
+        if (active) setLoadingCountries(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [toast]);
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((current) => ({ ...current, [name]: value }));
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+  const handleCountryChange = async (event) => {
+    const countryCode = event.target.value;
+    const country = countries.find((item) => item.country_short_name === countryCode);
+    const requestId = ++statesRequest.current;
+    setFormData((current) => ({
+      ...current,
+      country: country ? country.country_name : "",
+      countryCode,
+      state: "",
+    }));
+    setStates([]);
+    if (!country) return;
 
-  const handleSubmit = async () => {
+    setLoadingStates(true);
     try {
-      const data = await registerUser(formData);
-      setResponse(data);
-      window.scroll(0, 10000);
-      setFormData();
+      const data = await fetchStates(country.country_name);
+      if (requestId === statesRequest.current) setStates(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.log(error);
+      if (requestId === statesRequest.current) {
+        toast({ title: "Regions could not be loaded", description: "You can still continue without selecting one.", status: "warning", duration: 4000, isClosable: true });
+      }
+    } finally {
+      if (requestId === statesRequest.current) setLoadingStates(false);
     }
   };
 
-  useEffect(() => {
-    setTimeout(async () => {
-      const data = await fetchCountries();
-      setCountries(data);
-    }, 1000);
-  }, []);
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setSubmitting(true);
+    try {
+      const data = await registerUser(formData);
+      if (!data) throw new Error("Registration was not accepted");
+      setRegistered(true);
+    } catch (error) {
+      toast({ title: "We couldn't create your account", description: "Check your details and try again.", status: "error", duration: 4500, isClosable: true });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (registered) {
+    return (
+      <Alert status="success" alignItems="flex-start" borderRadius="4px" p={6}>
+        <AlertIcon mt={1} />
+        <Box>
+          <Heading as="h2" fontSize="xl">You're on the list.</Heading>
+          <Text mt={2}>Your Compass account has been created. Start exploring the journal or share a story of your own.</Text>
+        </Box>
+      </Alert>
+    );
+  }
 
   return (
-    <Stack>
-      <FormControl onSubmit={handleSubmit}>
-        <FormLabel htmlFor="First Name">First Name</FormLabel>
-        <Input
-          name="firstName"
-          placeholder="First Name"
-          onChange={handleChange}
-        />
-        <FormLabel htmlFor="Last Name">Last Name</FormLabel>
-        <Input
-          name="lastName"
-          placeholder="Last Name"
-          onChange={handleChange}
-        />
-        <FormLabel htmlFor="Phone">Phone Number</FormLabel>
-        <Input
-          name="phone"
-          placeholder="Phone number"
-          onChange={handleChange}
-        />
+    <Box as="form" onSubmit={handleSubmit}>
+      <VStack spacing={6} align="stretch">
+        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={5}>
+          <FormControl isRequired>
+            <FormLabel htmlFor="firstName">First name</FormLabel>
+            <Input id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} autoComplete="given-name" bg="white" />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel htmlFor="lastName">Last name</FormLabel>
+            <Input id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} autoComplete="family-name" bg="white" />
+          </FormControl>
+        </SimpleGrid>
 
-        <FormLabel htmlFor="country">Country</FormLabel>
-        <Select
-          id="country"
-          placeholder="Select country"
-          name="country"
-          onChange={handleOnCountry}
-          color="black"
-        >
-          {countries &&
-            countries.map((country, index) => (
-              <option value={JSON.stringify(country)} key={index}>
-                {country.country_name}
-              </option>
-            ))}
-        </Select>
+        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={5}>
+          <FormControl isRequired>
+            <FormLabel htmlFor="email">Email address</FormLabel>
+            <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} autoComplete="email" bg="white" />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel htmlFor="phone">Phone number</FormLabel>
+            <Input id="phone" name="phone" type="tel" value={formData.phone} onChange={handleChange} autoComplete="tel" bg="white" />
+          </FormControl>
+        </SimpleGrid>
 
-        {states && (
-          <>
-            <FormLabel htmlFor="state">State</FormLabel>
-            <Select
-              id="country"
-              placeholder="Select state"
-              name="state"
-              onChange={handleChange}
-              color="black"
-            >
-              {React.Children.toArray(
-                states.map((state, index) => (
-                  <option value={state.state_name}>{state.state_name}</option>
-                ))
-              )}
+        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={5}>
+          <FormControl>
+            <FormLabel htmlFor="country">Country</FormLabel>
+            <Select id="country" name="countryCode" value={formData.countryCode} onChange={handleCountryChange} placeholder={loadingCountries ? "Loading countries..." : "Choose a country"} isDisabled={loadingCountries} bg="white">
+              {countries.map((country) => (
+                <option key={country.country_short_name} value={country.country_short_name}>{country.country_name}</option>
+              ))}
             </Select>
-          </>
-        )}
-        <FormLabel htmlFor="email">Email</FormLabel>
-        <Input
-          name="email"
-          type="email"
-          placeholder="email"
-          onChange={handleChange}
-        />
-        <FormLabel htmlFor="password">Password</FormLabel>
-        <Input
-          name="password"
-          type="password"
-          placeholder="Password"
-          onChange={handleChange}
-        />
-        <Button onClick={handleSubmit}>Register</Button>
-      </FormControl>
-      {response && (
-        <Stack>
-          <Divider borderColor="black" ml="40px" mr="40px" mb="30px" />
-          <Heading color="green.500">Registeration Successful</Heading>
-          <Box
-            ml="20px"
-            mr="20px"
-            whiteSpace="pre"
-            h="80vh"
-            display="flex"
-            flexDir="column"
-            justifyContent="space-between"
-            borderWidth="2px"
-            rounded="sm"
-            p="20px"
-            bg="grey.900"
-          >
-            <Text fontSize="25px" textAlign="center">
-              Your Data
-            </Text>
-            <Text fontSize="15px">
-              <b>Firstname:</b> {response.firstName}
-            </Text>
-            <Text fontSize="15px">
-              <b>Lastname: </b>
-              {response.lastName}
-            </Text>
-            <Text fontSize="15px">
-              <b>Email: </b>
-              {response.email}
-            </Text>
-            <Text fontSize="15px">
-              <b>Phone: </b>
-              {response.phone}
-            </Text>
-            <Text fontSize="15px">
-              <b>Country: </b>
-              {response.country}
-            </Text>
-            <Text fontSize="15px">
-              <b>State: </b>
-              {response.state}
-            </Text>
-            <Text fontSize="15px">
-              <b>UserID:</b> {response.userId}
-            </Text>
-          </Box>
-        </Stack>
-      )}
-    </Stack>
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="state">State or region</FormLabel>
+            <Select id="state" name="state" value={formData.state} onChange={handleChange} placeholder={loadingStates ? "Loading regions..." : "Choose a region"} isDisabled={!states.length || loadingStates} bg="white">
+              {states.map((state) => (
+                <option key={state.state_name} value={state.state_name}>{state.state_name}</option>
+              ))}
+            </Select>
+          </FormControl>
+        </SimpleGrid>
+
+        <FormControl isRequired>
+          <FormLabel htmlFor="password">Password</FormLabel>
+          <Input id="password" name="password" type="password" value={formData.password} onChange={handleChange} autoComplete="new-password" minLength={8} bg="white" />
+          <Text mt={2} color="gray.500" fontSize="xs">Use at least 8 characters.</Text>
+        </FormControl>
+
+        <Button type="submit" isLoading={submitting} loadingText="Creating account" size="lg" bg="ink" color="white" borderRadius="full" alignSelf="flex-start" px={8} _hover={{ bg: "green.800", transform: "translateY(-1px)" }}>
+          Create account
+        </Button>
+      </VStack>
+    </Box>
   );
 };
