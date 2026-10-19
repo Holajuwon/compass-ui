@@ -8,11 +8,11 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { FaPen, FaLightbulb } from "react-icons/fa";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { createPost } from "./api";
 
 const Postboard = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const toast = useToast();
 
   const [post, setPost] = useState();
@@ -32,7 +32,7 @@ const Postboard = () => {
         isClosable: true,
         position: "top",
       });
-      history.push("/posts");
+      navigate("/posts");
     } else {
       toast({
         title: "Couldn't create post.",

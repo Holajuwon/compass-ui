@@ -1,51 +1,46 @@
 import React from "react";
-import {
-  Box,
-  Button,
-  Flex,
-  Image,
-  Input,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Button, Flex, Heading, Image, Text } from "@chakra-ui/react";
+import { Link as RouterLink } from "react-router-dom";
+import { FaArrowRight } from "react-icons/fa";
 
 export const HomeForm = () => {
   return (
-    <Box pos="relative" marginY="30px">
-      <Stack
-        pos="absolute"
-        w="25vw"
-        m="5px"
-        top="20vh"
-        left="20px"
-        color="white"
-      >
-        <Text fontSize="40px" whiteSpace="5px">
-          <em>Get 30%</em> of <br /> your first Story
-        </Text>
-        <Text>
-          Enter Your email address here to receive your discount code.
-        </Text>
-        <Flex justify="space-around">
-          <Input
-            name="email"
-            placeholder="Your Email"
-            variant="outlined"
-            bg="grey"
-            maxW="15vw"
-          />
-          <Button bg="#052142" color="white">
-            Subscribe
-          </Button>
-        </Flex>
-      </Stack>
+    <Box as="section" position="relative" minH={{ base: "440px", md: "520px" }} overflow="hidden" bg="#17251f">
       <Image
         src="https://res.cloudinary.com/dobztfsdj/image/upload/v1580686530/samples/landscapes/girl-urban-view.jpg"
-        h="80vh"
+        alt="A woman looking out over a city from a rooftop"
+        position="absolute"
+        inset={0}
         w="100%"
-        backgroundSize="cover"
-        bg='grey.900'
+        h="100%"
+        objectFit="cover"
+        objectPosition="center 42%"
+        loading="lazy"
       />
+      <Box position="absolute" inset={0} bg="linear-gradient(90deg, rgba(12, 28, 24, 0.84), rgba(12, 28, 24, 0.25))" />
+      <Flex position="relative" zIndex={1} minH={{ base: "440px", md: "520px" }} maxW="1200px" mx="auto" px={{ base: 6, md: 10 }} py={16} align="center">
+        <Box maxW="600px" color="white">
+          <Text color="#b7ded0" fontWeight="bold" textTransform="uppercase" fontSize="sm">Make room for your voice</Text>
+          <Heading as="h2" mt={4} fontFamily="Georgia, serif" fontSize={{ base: "4xl", md: "5xl" }} fontWeight="medium" lineHeight="1.1">
+            Have a story to tell?
+          </Heading>
+          <Text mt={5} maxW="480px" color="whiteAlpha.900" fontSize="lg" lineHeight="1.7">
+            Share an idea, a lesson, or a perspective with the Compass community.
+          </Text>
+          <Button
+            as={RouterLink}
+            to="/register"
+            mt={7}
+            size="lg"
+            bg="#b7ded0"
+            color="#17251f"
+            _hover={{ bg: "white", transform: "translateY(-2px)" }}
+            rightIcon={<FaArrowRight />}
+          >
+            Create your account
+          </Button>
+        </Box>
+      </Flex>
     </Box>
   );
 };
