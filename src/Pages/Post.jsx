@@ -6,6 +6,7 @@ import Post from "../components/Post";
 import AddComment from "../components/AddComment";
 import CommentList from "../components/CommentList";
 import { createComment, fetchComment, fetchNews } from "../components/api";
+import samplePosts from "../data/samplePosts";
 
 const normalizeTitle = (title = "") => title.trim().replace(/_/g, " ").toLowerCase();
 
@@ -28,7 +29,7 @@ const PostPage = () => {
   const [story, setStory] = useState(() =>
     location.state?.post_title && normalizeTitle(location.state.post_title) === normalizeTitle(slug)
       ? location.state
-      : findPost(readCachedPosts(), slug)
+      : findPost([...readCachedPosts(), ...samplePosts], slug)
   );
   const [loading, setLoading] = useState(!story);
   const [comments, setComments] = useState([]);
@@ -38,7 +39,7 @@ const PostPage = () => {
     const routeStory = location.state?.post_title && normalizeTitle(location.state.post_title) === normalizeTitle(slug)
       ? location.state
       : null;
-    const cachedStory = findPost(readCachedPosts(), slug);
+    const cachedStory = findPost([...readCachedPosts(), ...samplePosts], slug);
 
     if (routeStory || cachedStory) {
       setStory(routeStory || cachedStory);
@@ -67,7 +68,7 @@ const PostPage = () => {
 
   useEffect(() => {
     let active = true;
-    if (!story?.post_id) {
+    if (!story?.post_id || story.isDemo) {
       setComments([]);
       setCommentCount(0);
       return () => {
@@ -85,7 +86,7 @@ const PostPage = () => {
     return () => {
       active = false;
     };
-  }, [story?.post_id]);
+  }, [story?.post_id, story?.isDemo]);
 
   const handleCommentSubmit = async (newComment) => {
     try {
@@ -103,7 +104,13 @@ const PostPage = () => {
   return (
     <Layout>
       <Post content={story} loading={loading} />
-      {story && (
+      {story?.isDemo ? (
+        <Box maxW="900px" w="full" mx="auto" px={{ base: 5, md: 10 }} pb={{ base: 12, md: 18 }}>
+          <Box role="status" px={4} py={3} bg="green.50" borderLeft="3px solid" borderColor="green.600">
+            <Text color="green.900" fontSize="sm">This is a sample story. Comments are available on live stories.</Text>
+          </Box>
+        </Box>
+      ) : story && (
         <Box maxW="900px" w="full" mx="auto" px={{ base: 5, md: 10 }} pb={{ base: 12, md: 18 }}>
           <Box pt={8} borderTop="1px solid" borderColor="blackAlpha.200">
             <Heading as="h2" fontSize="2xl">Join the conversation</Heading>

@@ -17,6 +17,9 @@ const stories = [
 ];
 
 beforeEach(() => {
+  localStorage.clear();
+  fetchNews.mockClear();
+  fetchComment.mockClear();
   fetchNews.mockResolvedValue(stories);
   fetchComment.mockResolvedValue({ comment: [], count: 0 });
 });
@@ -47,7 +50,6 @@ test("filters stories from the query string", async () => {
 });
 
 test("loads a story from a cold URL once and shows comments", async () => {
-  localStorage.removeItem("posts");
   render(
     <MemoryRouter initialEntries={["/post/A_study_in_thoughtful_design"]}>
       <Routes>
@@ -59,4 +61,34 @@ test("loads a story from a cold URL once and shows comments", async () => {
   expect(await screen.findByRole("heading", { name: "A study in thoughtful design" })).toBeInTheDocument();
   expect(screen.getByRole("heading", { name: "Join the conversation" })).toBeInTheDocument();
   expect(fetchNews).toHaveBeenCalledTimes(1);
+});
+
+test("shows cached and sample stories when the live feed fails", async () => {
+  localStorage.setItem("posts", JSON.stringify([stories[0]]));
+  fetchNews.mockRejectedValueOnce(new Error("API unavailable"));
+  render(
+    <MemoryRouter initialEntries={["/posts"]}>
+      <AllPosts />
+    </MemoryRouter>
+  );
+
+  expect(await screen.findByText("Preview stories are showing")).toBeInTheDocument();
+  expect(screen.getByText("13 stories")).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "A slower internet is a better internet" })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: stories[0].post_title })).toBeInTheDocument();
+});
+
+test("opens a sample story directly without requesting live comments", async () => {
+  fetchNews.mockRejectedValueOnce(new Error("API unavailable"));
+  render(
+    <MemoryRouter initialEntries={["/post/A_slower_internet_is_a_better_internet"]}>
+      <Routes>
+        <Route path="/post/:string" element={<PostPage />} />
+      </Routes>
+    </MemoryRouter>
+  );
+
+  expect(await screen.findByRole("heading", { name: "A slower internet is a better internet" })).toBeInTheDocument();
+  expect(screen.getByText("This is a sample story. Comments are available on live stories.")).toBeInTheDocument();
+  expect(fetchComment).not.toHaveBeenCalled();
 });

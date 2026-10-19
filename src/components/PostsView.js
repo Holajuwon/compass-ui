@@ -16,6 +16,7 @@ import { Link as RouterLink, useSearchParams } from "react-router-dom";
 import { FaArrowRight, FaPenNib, FaSearch } from "react-icons/fa";
 import PostCard from "./PostCard";
 import { fetchNews } from "./api";
+import samplePosts from "../data/samplePosts";
 
 const topics = ["All stories", "Technology", "Design", "Business", "Culture"];
 const getCachedPosts = () => {
@@ -26,10 +27,15 @@ const getCachedPosts = () => {
     return [];
   }
 };
+const getFallbackPosts = (cachedPosts) => [
+  ...cachedPosts.filter((post) => !post.isDemo),
+  ...samplePosts,
+];
 
 const PostsView = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [usingSamples, setUsingSamples] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get("q") || "";
   const deferredSearch = useDeferredValue(search);
@@ -40,25 +46,26 @@ const PostsView = () => {
 
     const loadPosts = async () => {
       try {
-        const news = navigator.onLine ? await fetchNews() : null;
         const cached = getCachedPosts();
-        if (active) setPosts(Array.isArray(news) ? news : cached);
-        if (!navigator.onLine && active) {
-          toast({ title: "Browsing offline stories", status: "info", duration: 3500, isClosable: true });
+        if (!navigator.onLine) {
+          if (active) {
+            setPosts(getFallbackPosts(cached));
+            setUsingSamples(true);
+          }
+          return;
+        }
+
+        const news = await fetchNews();
+        if (active) {
+          const livePosts = Array.isArray(news) ? news : [];
+          setPosts(livePosts.length ? livePosts : samplePosts);
+          setUsingSamples(!livePosts.length);
         }
       } catch (error) {
         const cached = getCachedPosts();
         if (active) {
-          setPosts(Array.isArray(cached) ? cached : []);
-          if (!cached.length) {
-            toast({
-              title: "Stories could not be loaded",
-              description: "Check your connection and try again.",
-              status: "error",
-              duration: 5000,
-              isClosable: true,
-            });
-          }
+          setPosts(getFallbackPosts(cached));
+          setUsingSamples(true);
         }
       } finally {
         if (active) setLoading(false);
@@ -99,6 +106,13 @@ const PostsView = () => {
             Write a story
           </Button>
         </Flex>
+
+        {usingSamples && (
+          <Box role="status" mt={5} px={4} py={3} bg="green.50" borderLeft="3px solid" borderColor="green.600">
+            <Text color="green.900" fontSize="sm" fontWeight="semibold">Preview stories are showing</Text>
+            <Text mt={1} color="green.800" fontSize="sm">The journal is offline right now. Sample stories are included so you can keep exploring.</Text>
+          </Box>
+        )}
 
         <Flex mt={{ base: 8, md: 12 }} gap={6} align={{ base: "stretch", md: "center" }} direction={{ base: "column", md: "row" }}>
           <InputGroup w="full" maxW={{ base: "full", md: "480px" }}>
