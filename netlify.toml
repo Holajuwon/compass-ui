@@ -1,6 +1,9 @@
- [[redirects]]
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-  [build]
-  command = "CI= npm run build"
+[build]
+command = "CI= npm run build"
+
+[build.environment]
+NODE_VERSION = "24"
